@@ -1,10 +1,11 @@
 ﻿#include "Nussinov.h"
 
-void RNAFold::Nussinov::ReadFile(std::string path)
+std::vector<std::string> RNAFold::Nussinov::ReadFile(std::string path)
 {
-    std::vector<std::string> n;
+    std::vector<std::string> sequences;
     std::ifstream dnaFile;
     std::string line;
+    std::string seq;
     dnaFile.open(path);
     while (!dnaFile.is_open())
     {
@@ -16,12 +17,15 @@ void RNAFold::Nussinov::ReadFile(std::string path)
     {
         if (line.find('>') != std::string::npos)
         {
-            line.erase(line.begin());
+            if(!seq.empty())
+                sequences.emplace_back(seq);
+            seq.erase(seq.begin(), seq.end());
             continue;
         }
-        _sequence += line;
+        seq += line;
     }
-    
+    sequences.emplace_back(seq);
+    return sequences;
 }
 
 void RNAFold::Nussinov::ComputeMatrix()
@@ -93,4 +97,19 @@ void RNAFold::Nussinov::ComputeMatrix()
        newPos++;
     }
     _nussinovMatrix.DisplayMatrix();
+    _pairedRNA.emplace_back(TraceBack(_sequence.length() + 1, 1));
+}
+
+std::string RNAFold::Nussinov::TraceBack(int j, int i)
+{
+    if(_nussinovMatrix.matrix[j][i] == "0") // no more pairing needed
+    {
+        
+    }
+    std::string left =  _nussinovMatrix.matrix[j - 1][i];
+    std::string diagBehind =  _nussinovMatrix.matrix[j - 1][i + 1];
+    std::string under =  _nussinovMatrix.matrix[j][i + 1];
+    std::string letterOne =  _nussinovMatrix.matrix[j][0];
+    std::string letterTwo =  _nussinovMatrix.matrix[0][i];
+    return "";
 }
