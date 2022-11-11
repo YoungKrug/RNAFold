@@ -1,4 +1,5 @@
 ﻿#pragma once
+#include <iostream>
 #include <vector>
 #include <string>
 
@@ -15,5 +16,17 @@ namespace RNAFold
             matrix = sMatrix;
         }
         Matrix<T>(){}
+        void DisplayMatrix()
+        {
+          for(int j = 0; j < matrix.size(); j++)
+          {
+              for(int i = 0; i < matrix[0].size(); i++)
+              {
+                  std::cout << matrix[i][j] << " ";
+              }
+              std::cout << std::endl;
+          }
+            
+        }
     };
 }
