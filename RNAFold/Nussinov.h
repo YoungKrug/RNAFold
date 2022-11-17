@@ -6,6 +6,7 @@
 #include <cstring>
 #include <algorithm>
 #include <set>
+#include <unordered_set>
 
 namespace RNAFold
 {
@@ -22,25 +23,30 @@ namespace RNAFold
                 std::cin >> outFilePath;
             }
             std::vector<std::string> vec = ReadFile(path);
-            _pairs.emplace_back(std::pair<std::string, std::string>("A", "U"));
-            _pairs.emplace_back(std::pair<std::string, std::string>("U", "A"));
-            _pairs.emplace_back(std::pair<std::string, std::string>("A", "T"));
-            _pairs.emplace_back(std::pair<std::string, std::string>("T", "A"));
-            _pairs.emplace_back(std::pair<std::string, std::string>("G", "C"));
-            _pairs.emplace_back(std::pair<std::string, std::string>("C", "G"));
+            _complementDictionary.insert({"A+U"});
+            _complementDictionary.insert({"U+A"});
+            _complementDictionary.insert({"C+G"});
+            _complementDictionary.insert({"G+C"});
             int i = 0;
             for(auto seq : vec)
             {
                 _nussinovMatrix = Matrix<std::string>(seq.length() + 1, seq.length() + 1);
-                bindString = std::string(seq.length(),'.');
+                _bindString = std::string(seq.length(),'.');
+                if(seq.find('T') != std::string::npos)
+                {
+                    std::cout << "Sequence: " << i + 1 << " is not a valid rna sequence.\n Skipping...\n";
+                    i++;
+                    continue;
+                }
                 _sequence = seq;
                 ComputeMatrix();
-                of << "Sequence: " << ++i << "\n";
+                of << "Sequence: " << i + 1 << "\n";
                 for (auto i : _pairedRNA)
                 {
                     of << i << "\n";
                 }
                 _pairedRNA.clear();
+                i++;
                 std::cout << std::endl;
             }
             
@@ -51,10 +57,9 @@ namespace RNAFold
     private:
         Matrix<std::string> _nussinovMatrix;
         std::string _sequence;
-        std::vector<std::pair<std::string, std::string>> _pairs;
         std::set<std::string> _pairedRNA;
-        std::string bindString;
-        
+        std::string _bindString;
+        std::unordered_set<std::string> _complementDictionary;
     };
     
     

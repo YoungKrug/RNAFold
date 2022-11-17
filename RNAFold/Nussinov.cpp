@@ -60,13 +60,10 @@ void RNAFold::Nussinov::ComputeMatrix()
            std::string letterTwo =  _nussinovMatrix.matrix[0][i];
            int increase = 0;
            std::pair<std::string, std::string> newPair = std::pair<std::string, std::string>(letterOne, letterTwo);
-           for(auto vec : _pairs)
+           std::string pairedKey = letterOne + "+" + letterTwo;
+           if(_complementDictionary.find(pairedKey) != _complementDictionary.end())
            {
-               if(vec == newPair)
-               {
-                   increase++;
-                   break;
-               }
+               increase++;
            }
            int valDiag = increase + stoi(diagBehind);
            int valLeft = stoi(left);
@@ -97,7 +94,7 @@ void RNAFold::Nussinov::ComputeMatrix()
        newPos++;
     }
     //_nussinovMatrix.DisplayMatrix();
-    TraceBack(_sequence.length(), 1, bindString);
+    TraceBack(_sequence.length(), 1, _bindString);
 }
 
 void RNAFold::Nussinov::TraceBack(int j, int i, std::string finalPair, int index)
@@ -116,14 +113,9 @@ void RNAFold::Nussinov::TraceBack(int j, int i, std::string finalPair, int index
     std::string letterTwo =  _nussinovMatrix.matrix[0][i + 1];
     std::pair<std::string, std::string> newPair = std::pair<std::string, std::string>(letterOne, letterTwo);
     bool diagonalPaired = false;
-    for(auto vec : _pairs)
-    {
-        if(vec == newPair)
-        {
-            diagonalPaired = true;
-            break;
-        }
-    }
+    std::string pairKey = letterOne + "+" + letterTwo;
+    if(_complementDictionary.find(pairKey) != _complementDictionary.end())
+        diagonalPaired = true;
     if(diagonalPaired)
     {
         finalPair[index] = '(';// head
