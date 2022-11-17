@@ -108,41 +108,36 @@ void RNAFold::Nussinov::TraceBack(int j, int i, std::string finalPair, int index
         // std::cout << finalPair << std::endl;
         return;
     }
-        int left =  std::stoi(_nussinovMatrix.matrix[j - 1][i]);
-        int diagBehind = std::stoi( _nussinovMatrix.matrix[j - 1][i + 1]);
-        int under =  std::stoi(_nussinovMatrix.matrix[j][i + 1]);
-        int currentVal = std::stoi(_nussinovMatrix.matrix[j][i]);
-        std::string letterOne =  _nussinovMatrix.matrix[j][0];
-        std::string letterTwo =  _nussinovMatrix.matrix[0][i];
-        //std::cout << index << " : " << _nussinovMatrix.matrix[0].size() << std::endl;
-        if( index > _nussinovMatrix.matrix[0].size() - 1)
+    int left =  std::stoi(_nussinovMatrix.matrix[j - 1][i]);
+    int diagBehind = std::stoi( _nussinovMatrix.matrix[j - 1][i + 1]);
+    int under =  std::stoi(_nussinovMatrix.matrix[j][i + 1]);
+    int currentVal = std::stoi(_nussinovMatrix.matrix[j][i]);
+    std::string letterOne =  _nussinovMatrix.matrix[j - 1][0];
+    std::string letterTwo =  _nussinovMatrix.matrix[0][i + 1];
+    std::pair<std::string, std::string> newPair = std::pair<std::string, std::string>(letterOne, letterTwo);
+    bool diagonalPaired = false;
+    for(auto vec : _pairs)
+    {
+        if(vec == newPair)
         {
-            return;
+            diagonalPaired = true;
+            break;
         }
-        if(currentVal - 1 ==  diagBehind) // This mean we paired
-        {
-            //we came diagonal
-            finalPair[index] = '(';// head
-            finalPair[(finalPair.size() - index)] = ')'; //tail
-            return TraceBack(j - 1, i + 1, finalPair, ++index);
-        }
-        if(currentVal > diagBehind + 1)
-        {
-            // go through the middle, it means bifurcation
-            //we came diagonal
-            finalPair.at(index) = '(';// head
-            int size = finalPair.size() - 1;
-            finalPair.at(size - index) = ')'; //tail
-            return TraceBack(j - 1, i + 1, finalPair, ++index);
-        }
-        if(currentVal == left) // if we are paired, this should never occur
-        {
-            //No pairs
-            return TraceBack(j - 1, i, finalPair, ++index); //no changes
-        }
-        if(currentVal == under) // if we are paired, this should never occur
-        {
-            //No pairs
-           return TraceBack(j, i + 1, finalPair, ++index); //no changes
-        }
+    }
+    if(diagonalPaired)
+    {
+        finalPair[index] = '(';// head
+        finalPair[(finalPair.size() - index)] = ')'; //tail
+        TraceBack(j - 1, i + 1, finalPair, ++index);
+    }
+    if(currentVal == left)
+    {
+        TraceBack(j - 1, i, finalPair, ++index);
+    }
+    if(currentVal == left)
+    {
+        TraceBack(j, i + 1, finalPair, ++index);
+    }
+    
+      
 }
