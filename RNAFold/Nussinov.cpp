@@ -97,19 +97,52 @@ void RNAFold::Nussinov::ComputeMatrix()
        newPos++;
     }
     _nussinovMatrix.DisplayMatrix();
-    _pairedRNA.emplace_back(TraceBack(_sequence.length() + 1, 1));
+    TraceBack(_sequence.length(), 1, bindString);
 }
 
-std::string RNAFold::Nussinov::TraceBack(int j, int i)
+void RNAFold::Nussinov::TraceBack(int j, int i, std::string finalPair, int index)
 {
     if(_nussinovMatrix.matrix[j][i] == "0") // no more pairing needed
     {
-        
+        _pairedRNA.emplace_back(finalPair);
+        // std::cout << finalPair << std::endl;
+        return;
     }
-    std::string left =  _nussinovMatrix.matrix[j - 1][i];
-    std::string diagBehind =  _nussinovMatrix.matrix[j - 1][i + 1];
-    std::string under =  _nussinovMatrix.matrix[j][i + 1];
-    std::string letterOne =  _nussinovMatrix.matrix[j][0];
-    std::string letterTwo =  _nussinovMatrix.matrix[0][i];
-    return "";
+        int left =  std::stoi(_nussinovMatrix.matrix[j - 1][i]);
+        int diagBehind = std::stoi( _nussinovMatrix.matrix[j - 1][i + 1]);
+        int under =  std::stoi(_nussinovMatrix.matrix[j][i + 1]);
+        int currentVal = std::stoi(_nussinovMatrix.matrix[j][i]);
+        std::string letterOne =  _nussinovMatrix.matrix[j][0];
+        std::string letterTwo =  _nussinovMatrix.matrix[0][i];
+        //std::cout << index << " : " << _nussinovMatrix.matrix[0].size() << std::endl;
+        if( index > _nussinovMatrix.matrix[0].size() - 1)
+        {
+            return;
+        }
+        if(currentVal - 1 ==  diagBehind) // This mean we paired
+        {
+            //we came diagonal
+            finalPair.at(index) = '(';// head
+            finalPair.at(finalPair.size() - index) = ')'; //tail
+            TraceBack(j - 1, i + 1, finalPair, ++index);
+        }
+        if(currentVal > diagBehind + 1)
+        {
+            // go through the middle, it means bifurcation
+            //we came diagonal
+            finalPair.at(index) = '(';// head
+            int size = finalPair.size() - 1;
+            finalPair.at(size - index) = ')'; //tail
+            TraceBack(j - 1, i + 1, finalPair, ++index);
+        }
+        if(currentVal == left) // if we are paired, this should never occur
+        {
+            //No pairs
+            TraceBack(j - 1, i, finalPair, ++index); //no changes
+        }
+        if(currentVal == under) // if we are paired, this should never occur
+        {
+            //No pairs
+            TraceBack(j, i + 1, finalPair, ++index); //no changes
+        }
 }
