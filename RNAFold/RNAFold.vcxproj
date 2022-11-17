@@ -163,6 +163,7 @@
     <ClInclude Include="Nussinov.h" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="outfile.txt" />
     <Content Include="RnaSeq.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

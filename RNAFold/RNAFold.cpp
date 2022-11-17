@@ -5,6 +5,6 @@
 
 int main(int argc, char* argv[])
 {
-    RNAFold::Nussinov nussinov = RNAFold::Nussinov("RnaSeq.txt", "outFile.txt");
+    RNAFold::Nussinov nussinov = RNAFold::Nussinov("RnaSeq.txt", "outfile.txt");
     return 0;
 }

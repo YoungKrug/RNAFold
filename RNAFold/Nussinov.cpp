@@ -96,7 +96,7 @@ void RNAFold::Nussinov::ComputeMatrix()
        }
        newPos++;
     }
-    _nussinovMatrix.DisplayMatrix();
+    //_nussinovMatrix.DisplayMatrix();
     TraceBack(_sequence.length(), 1, bindString);
 }
 
@@ -104,7 +104,7 @@ void RNAFold::Nussinov::TraceBack(int j, int i, std::string finalPair, int index
 {
     if(_nussinovMatrix.matrix[j][i] == "0") // no more pairing needed
     {
-        _pairedRNA.emplace_back(finalPair);
+        _pairedRNA.insert(finalPair);
         // std::cout << finalPair << std::endl;
         return;
     }
@@ -122,9 +122,9 @@ void RNAFold::Nussinov::TraceBack(int j, int i, std::string finalPair, int index
         if(currentVal - 1 ==  diagBehind) // This mean we paired
         {
             //we came diagonal
-            finalPair.at(index) = '(';// head
-            finalPair.at(finalPair.size() - index) = ')'; //tail
-            TraceBack(j - 1, i + 1, finalPair, ++index);
+            finalPair[index] = '(';// head
+            finalPair[(finalPair.size() - index)] = ')'; //tail
+            return TraceBack(j - 1, i + 1, finalPair, ++index);
         }
         if(currentVal > diagBehind + 1)
         {
@@ -133,16 +133,16 @@ void RNAFold::Nussinov::TraceBack(int j, int i, std::string finalPair, int index
             finalPair.at(index) = '(';// head
             int size = finalPair.size() - 1;
             finalPair.at(size - index) = ')'; //tail
-            TraceBack(j - 1, i + 1, finalPair, ++index);
+            return TraceBack(j - 1, i + 1, finalPair, ++index);
         }
         if(currentVal == left) // if we are paired, this should never occur
         {
             //No pairs
-            TraceBack(j - 1, i, finalPair, ++index); //no changes
+            return TraceBack(j - 1, i, finalPair, ++index); //no changes
         }
         if(currentVal == under) // if we are paired, this should never occur
         {
             //No pairs
-            TraceBack(j, i + 1, finalPair, ++index); //no changes
+           return TraceBack(j, i + 1, finalPair, ++index); //no changes
         }
 }
