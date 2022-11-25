@@ -1,8 +1,8 @@
 ﻿#include "Nussinov.h"
 
-std::vector<std::string> RNAFold::Nussinov::ReadFile(std::string path)
+std::vector<std::pair<std::string, std::string>> RNAFold::Nussinov::ReadFile(std::string path)
 {
-    std::vector<std::string> sequences;
+    std::vector<std::pair<std::string, std::string>>  sequences;
     std::ifstream dnaFile;
     std::string line;
     std::string seq;
@@ -13,18 +13,22 @@ std::vector<std::string> RNAFold::Nussinov::ReadFile(std::string path)
         std::cin >> path;
         dnaFile.open(path);
     }
+    std::pair<std::string, std::string> val;
     while (std::getline(dnaFile, line))
     {
         if (line.find('>') != std::string::npos)
         {
             if(!seq.empty())
-                sequences.emplace_back(seq);
+                sequences.emplace_back(val);
             seq.erase(seq.begin(), seq.end());
+            val.second.erase(val.second.begin(), val.second.end());
+            val.first = line;
             continue;
         }
         seq += line;
+        val.second += seq;
     }
-    sequences.emplace_back(seq);
+    sequences.emplace_back(val);
     return sequences;
 }
 

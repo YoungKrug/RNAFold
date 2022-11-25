@@ -22,7 +22,7 @@ namespace RNAFold
                 std::cout << "Please enter a valid outfile path" << std::endl;
                 std::cin >> outFilePath;
             }
-            std::vector<std::string> vec = ReadFile(path);
+            std::vector<std::pair<std::string, std::string>>  vec = ReadFile(path);
             _complementDictionary.insert({"A+U"});
             _complementDictionary.insert({"U+A"});
             _complementDictionary.insert({"C+G"});
@@ -30,28 +30,28 @@ namespace RNAFold
             int i = 0;
             for(auto seq : vec)
             {
-                _nussinovMatrix = Matrix<std::string>(seq.length() + 1, seq.length() + 1);
-                _bindString = std::string(seq.length(),'.');
-                if(seq.find('T') != std::string::npos)
+                int lengh = seq.second.length();
+                _nussinovMatrix = Matrix<std::string>(lengh + 1, lengh + 1);
+                _bindString = std::string(lengh,'.');
+                if(seq.second.find('T') != std::string::npos)
                 {
-                    std::cout << "Sequence: " << i + 1 << " is not a valid rna sequence.\n Skipping...\n";
+                    std::cout << "Sequence: " << seq.first << " is not a valid rna sequence.\n Skipping...\n";
                     i++;
                     continue;
                 }
-                _sequence = seq;
+                _sequence = seq.second;
                 ComputeMatrix();
-                of << "Sequence: " << i + 1 << "\n";
+                of << seq.first << "\n";
                 for (auto i : _pairedRNA)
                 {
                     of << i << "\n";
                 }
                 _pairedRNA.clear();
                 i++;
-                std::cout << std::endl;
             }
             
         }
-        std::vector<std::string> ReadFile(std::string);
+        std::vector<std::pair<std::string, std::string>>  ReadFile(std::string);
         void ComputeMatrix();
         int Bifurcation(int,int) const;
         void TraceBack(int,int,std::string, int index = 0);
