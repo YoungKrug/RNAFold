@@ -53,6 +53,7 @@ namespace RNAFold
         }
         std::vector<std::string> ReadFile(std::string);
         void ComputeMatrix();
+        int Bifurcation(int,int) const;
         void TraceBack(int,int,std::string, int index = 0);
     private:
         Matrix<std::string> _nussinovMatrix;

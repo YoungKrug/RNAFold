@@ -68,33 +68,41 @@ void RNAFold::Nussinov::ComputeMatrix()
            int valDiag = increase + stoi(diagBehind);
            int valLeft = stoi(left);
            int valUnder = stoi(under);
-           int bifurcation = 0;
-           if(j > i + 3)
-           {
-               std::vector<int> val;
-               int k = i + 1;
-               int k1 = i + 2;
-               while(k + 2 < j)
-               {
-                   std::string val1 = _nussinovMatrix.matrix[k][i];
-                   std::string val2 = _nussinovMatrix.matrix[j][k1];
-                   val.emplace_back(std::stoi(val1) + std::stoi(val2));
-                   k++;
-                   k1++;
-               }
-               bifurcation = *std::max_element(val.begin(), val.end());
-               ///(i,k) and (k+1, j)
-               
-               //Grab the row and column
-           }
+           int bifurcation = Bifurcation(j,i);
+           if(newPos > 0)
            _nussinovMatrix.matrix[j][i] = std::to_string(std::max({valDiag,valUnder, valLeft, bifurcation}));
+           else
+               _nussinovMatrix.matrix[j][i] = "0";
            i++;
            remainingNodes--;
+           
        }
+       // _nussinovMatrix.DisplayMatrix();
        newPos++;
     }
-    //_nussinovMatrix.DisplayMatrix();
     TraceBack(_sequence.length(), 1, _bindString);
+  
+}
+
+int RNAFold::Nussinov::Bifurcation(int j, int i) const
+{
+    std::vector<int> val;
+    if(j > i + 3)
+    {
+        int k = i + 1;
+        int k1 = i + 2;
+        while(k + 2 < j)
+        {
+            std::string val1 = _nussinovMatrix.matrix[k][i];
+            std::string val2 = _nussinovMatrix.matrix[j][k1];
+            val.emplace_back(std::stoi(val1) + std::stoi(val2));
+            k++;
+            k1++;
+        }
+        ///(i,k) and (k+1, j)
+        //Grab the row and column
+    }
+    return val.empty() ? 0 : *std::max_element(val.begin(), val.end());
 }
 
 void RNAFold::Nussinov::TraceBack(int j, int i, std::string finalPair, int index)
@@ -102,7 +110,6 @@ void RNAFold::Nussinov::TraceBack(int j, int i, std::string finalPair, int index
     if(_nussinovMatrix.matrix[j][i] == "0") // no more pairing needed
     {
         _pairedRNA.insert(finalPair);
-        // std::cout << finalPair << std::endl;
         return;
     }
     int left =  std::stoi(_nussinovMatrix.matrix[j - 1][i]);
@@ -126,10 +133,23 @@ void RNAFold::Nussinov::TraceBack(int j, int i, std::string finalPair, int index
     {
         TraceBack(j - 1, i, finalPair, ++index);
     }
-    if(currentVal == left)
+    if(currentVal == under)
     {
         TraceBack(j, i + 1, finalPair, ++index);
     }
-    
-      
+    if(left == 0 && diagBehind == 0 && under == 0)
+    {
+        TraceBack(j - 1, i + 1, finalPair, ++index);
+    }
+    for(int k = i + 1; k < j - 1; k++)
+    {
+        if(std::stoi(_nussinovMatrix.matrix[k][i])
+            + stoi(_nussinovMatrix.matrix[j][k+1])
+            == currentVal)
+        {
+            TraceBack(j ,k + 1, finalPair, ++index);
+            TraceBack(k , i, finalPair, ++index);
+            break;
+        }
+    }
 }
