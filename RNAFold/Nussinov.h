@@ -54,7 +54,7 @@ namespace RNAFold
         std::vector<std::pair<std::string, std::string>>  ReadFile(std::string);
         void ComputeMatrix();
         int Bifurcation(int,int) const;
-        void TraceBack(int,int,std::string, int index = 0);
+        void TraceBack(int,int,std::string,std::vector<std::string> vec);
     private:
         Matrix<std::string> _nussinovMatrix;
         std::string _sequence;

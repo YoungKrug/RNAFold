@@ -81,11 +81,11 @@ void RNAFold::Nussinov::ComputeMatrix()
            remainingNodes--;
            
        }
-       // _nussinovMatrix.DisplayMatrix();
+       // 
        newPos++;
     }
-    TraceBack(_sequence.length(), 1, _bindString);
-  
+    _nussinovMatrix.DisplayMatrix();
+    TraceBack(_sequence.length(), 1, _bindString, std::vector<std::string>());
 }
 
 int RNAFold::Nussinov::Bifurcation(int j, int i) const
@@ -109,13 +109,10 @@ int RNAFold::Nussinov::Bifurcation(int j, int i) const
     return val.empty() ? 0 : *std::max_element(val.begin(), val.end());
 }
 
-void RNAFold::Nussinov::TraceBack(int j, int i, std::string finalPair, int index)
+void RNAFold::Nussinov::TraceBack(int j, int i, std::string finalPair, std::vector<std::string> process)
 {
-    if(_nussinovMatrix.matrix[j][i] == "0") // no more pairing needed
-    {
-        _pairedRNA.insert(finalPair);
-        return;
-    }
+   
+    int length = _sequence.length();
     int left =  std::stoi(_nussinovMatrix.matrix[j - 1][i]);
     int diagBehind = std::stoi( _nussinovMatrix.matrix[j - 1][i + 1]);
     int under =  std::stoi(_nussinovMatrix.matrix[j][i + 1]);
@@ -127,23 +124,42 @@ void RNAFold::Nussinov::TraceBack(int j, int i, std::string finalPair, int index
     std::string pairKey = letterOne + "+" + letterTwo;
     if(_complementDictionary.find(pairKey) != _complementDictionary.end())
         diagonalPaired = true;
+    if(_nussinovMatrix.matrix[j][i] == "0") // no more pairing needed
+    {
+        if(diagonalPaired)
+        {
+            finalPair[i - 1] = '(';// head
+            finalPair[j] = ')'; //tail
+            process.emplace_back(finalPair);
+        }
+        std::cout << "Sequence Process" << std::endl;
+        for(auto i: process)
+        {
+            std::cout << i << std::endl;
+        }
+        std::cout <<"\n\n";
+        //std::cout << process << std::endl;
+        _pairedRNA.insert(finalPair);
+        return;
+    }
     if(diagonalPaired)
     {
-        finalPair[index] = '(';// head
-        finalPair[(finalPair.size() - index)] = ')'; //tail
-        TraceBack(j - 1, i + 1, finalPair, ++index);
+        finalPair[i - 1] = '(';// head
+        finalPair[j] = ')'; //tail
+        process.emplace_back(finalPair);
+        TraceBack(j - 1, i + 1, finalPair, process);
     }
     if(currentVal == left)
     {
-        TraceBack(j - 1, i, finalPair, ++index);
+        TraceBack(j - 1, i, finalPair, process);
     }
     if(currentVal == under)
     {
-        TraceBack(j, i + 1, finalPair, ++index);
+        TraceBack(j, i + 1, finalPair, process);
     }
     if(left == 0 && diagBehind == 0 && under == 0)
     {
-        TraceBack(j - 1, i + 1, finalPair, ++index);
+        TraceBack(j - 1, i + 1, finalPair, process);
     }
     for(int k = i + 1; k < j - 1; k++)
     {
@@ -151,8 +167,8 @@ void RNAFold::Nussinov::TraceBack(int j, int i, std::string finalPair, int index
             + stoi(_nussinovMatrix.matrix[j][k+1])
             == currentVal)
         {
-            TraceBack(j ,k + 1, finalPair, ++index);
-            TraceBack(k , i, finalPair, ++index);
+            TraceBack(j ,k + 1, finalPair, process);
+            TraceBack(k , i, finalPair, process);
             break;
         }
     }
