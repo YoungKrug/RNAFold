@@ -117,8 +117,8 @@ void RNAFold::Nussinov::TraceBack(int j, int i, std::string finalPair, std::vect
     int diagBehind = std::stoi( _nussinovMatrix.matrix[j - 1][i + 1]);
     int under =  std::stoi(_nussinovMatrix.matrix[j][i + 1]);
     int currentVal = std::stoi(_nussinovMatrix.matrix[j][i]);
-    std::string letterOne =  _nussinovMatrix.matrix[j - 1][0];
-    std::string letterTwo =  _nussinovMatrix.matrix[0][i + 1];
+    std::string letterOne =  _nussinovMatrix.matrix[j][0];
+    std::string letterTwo =  _nussinovMatrix.matrix[0][i];
     std::pair<std::string, std::string> newPair = std::pair<std::string, std::string>(letterOne, letterTwo);
     bool diagonalPaired = false;
     std::string pairKey = letterOne + "+" + letterTwo;
@@ -128,9 +128,9 @@ void RNAFold::Nussinov::TraceBack(int j, int i, std::string finalPair, std::vect
     {
         if(diagonalPaired)
         {
-            finalPair[i - 1] = '(';// head
-            finalPair[j] = ')'; //tail
+            std::string processString = "Index I: " + std::to_string(i) + " Index J: " + std::to_string(j);
             process.emplace_back(finalPair);
+            process.emplace_back(processString);
         }
         std::cout << "Sequence Process" << std::endl;
         for(auto i: process)
@@ -144,10 +144,16 @@ void RNAFold::Nussinov::TraceBack(int j, int i, std::string finalPair, std::vect
     }
     if(diagonalPaired)
     {
-        finalPair[i - 1] = '(';// head
-        finalPair[j] = ')'; //tail
-        process.emplace_back(finalPair);
-        TraceBack(j - 1, i + 1, finalPair, process);
+        //String is not being reset after each process, so its going on and being reformatted after... NOOOOWW I SEE THE ISSUE AHHHHHH
+        std::string processString = "Index I: " + std::to_string(i) + " Index J: " + std::to_string(j);
+        std::string newString = finalPair;
+        newString[i - 1] = '(';// head
+        newString[j - 1] = ')'; //tail
+        // finalPair[i - 1] = '(';// head
+        // finalPair[j - 1] = ')'; //tail
+        process.emplace_back(newString);
+        process.emplace_back(processString);
+        TraceBack(j - 1, i + 1, newString, process);
     }
     if(currentVal == left)
     {
