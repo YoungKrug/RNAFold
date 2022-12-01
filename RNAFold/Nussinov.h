@@ -6,6 +6,7 @@
 #include <cstring>
 #include <algorithm>
 #include <set>
+#include <unordered_set>
 
 namespace RNAFold
 {
@@ -21,40 +22,45 @@ namespace RNAFold
                 std::cout << "Please enter a valid outfile path" << std::endl;
                 std::cin >> outFilePath;
             }
-            std::vector<std::string> vec = ReadFile(path);
-            _pairs.emplace_back(std::pair<std::string, std::string>("A", "U"));
-            _pairs.emplace_back(std::pair<std::string, std::string>("U", "A"));
-            _pairs.emplace_back(std::pair<std::string, std::string>("A", "T"));
-            _pairs.emplace_back(std::pair<std::string, std::string>("T", "A"));
-            _pairs.emplace_back(std::pair<std::string, std::string>("G", "C"));
-            _pairs.emplace_back(std::pair<std::string, std::string>("C", "G"));
+            std::vector<std::pair<std::string, std::string>>  vec = ReadFile(path);
+            _complementDictionary.insert({"A+U"});
+            _complementDictionary.insert({"U+A"});
+            _complementDictionary.insert({"C+G"});
+            _complementDictionary.insert({"G+C"});
             int i = 0;
             for(auto seq : vec)
             {
-                _nussinovMatrix = Matrix<std::string>(seq.length() + 1, seq.length() + 1);
-                bindString = std::string(seq.length(),'.');
-                _sequence = seq;
+                int lengh = seq.second.length();
+                _nussinovMatrix = Matrix<std::string>(lengh + 1, lengh + 1);
+                _bindString = std::string(lengh,'.');
+                if(seq.second.find('T') != std::string::npos)
+                {
+                    std::cout << "Sequence: " << seq.first << " is not a valid rna sequence.\n Skipping...\n";
+                    i++;
+                    continue;
+                }
+                _sequence = seq.second;
                 ComputeMatrix();
-                of << "Sequence: " << ++i << "\n";
+                of << seq.first << "\n";
                 for (auto i : _pairedRNA)
                 {
                     of << i << "\n";
                 }
                 _pairedRNA.clear();
-                std::cout << std::endl;
+                i++;
             }
             
         }
-        std::vector<std::string> ReadFile(std::string);
+        std::vector<std::pair<std::string, std::string>>  ReadFile(std::string);
         void ComputeMatrix();
-        void TraceBack(int,int,std::string, int index = 0);
+        int Bifurcation(int,int) const;
+        void TraceBack(int,int,std::string,std::vector<std::string> vec);
     private:
         Matrix<std::string> _nussinovMatrix;
         std::string _sequence;
-        std::vector<std::pair<std::string, std::string>> _pairs;
         std::set<std::string> _pairedRNA;
-        std::string bindString;
-        
+        std::string _bindString;
+        std::unordered_set<std::string> _complementDictionary;
     };
     
     

@@ -18,6 +18,7 @@ namespace RNAFold
         Matrix<T>(){}
         void DisplayMatrix()
         {
+            matrix[0][0] = " ";
           for(int j = 0; j < matrix.size(); j++)
           {
               for(int i = 0; i < matrix[0].size(); i++)
