@@ -111,7 +111,11 @@ int RNAFold::Nussinov::Bifurcation(int j, int i) const
 
 void RNAFold::Nussinov::TraceBack(int j, int i, std::string finalPair, std::vector<std::string> process)
 {
-   
+    if(_nussinovMatrix.matrix[j][i] == "0") // no more pairing needed
+    {
+        _pairedRNA.insert(finalPair);
+        return;
+    }
     int length = _sequence.length();
     int left =  std::stoi(_nussinovMatrix.matrix[j - 1][i]);
     int diagBehind = std::stoi( _nussinovMatrix.matrix[j - 1][i + 1]);
@@ -124,24 +128,7 @@ void RNAFold::Nussinov::TraceBack(int j, int i, std::string finalPair, std::vect
     std::string pairKey = letterOne + "+" + letterTwo;
     if(_complementDictionary.find(pairKey) != _complementDictionary.end())
         diagonalPaired = true;
-    if(_nussinovMatrix.matrix[j][i] == "0") // no more pairing needed
-    {
-        if(diagonalPaired)
-        {
-            std::string processString = "Index I: " + std::to_string(i) + " Index J: " + std::to_string(j);
-            process.emplace_back(finalPair);
-            process.emplace_back(processString);
-        }
-        std::cout << "Sequence Process" << std::endl;
-        for(auto i: process)
-        {
-            std::cout << i << std::endl;
-        }
-        std::cout <<"\n\n";
-        //std::cout << process << std::endl;
-        _pairedRNA.insert(finalPair);
-        return;
-    }
+
     if(diagonalPaired)
     {
         //String is not being reset after each process, so its going on and being reformatted after... NOOOOWW I SEE THE ISSUE AHHHHHH
@@ -149,10 +136,6 @@ void RNAFold::Nussinov::TraceBack(int j, int i, std::string finalPair, std::vect
         std::string newString = finalPair;
         newString[i - 1] = '(';// head
         newString[j - 1] = ')'; //tail
-        // finalPair[i - 1] = '(';// head
-        // finalPair[j - 1] = ')'; //tail
-        process.emplace_back(newString);
-        process.emplace_back(processString);
         TraceBack(j - 1, i + 1, newString, process);
     }
     if(currentVal == left)
