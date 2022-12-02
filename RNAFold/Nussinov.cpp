@@ -121,6 +121,8 @@ void RNAFold::Nussinov::TraceBack(int j, int i, std::string finalPair, std::vect
     std::pair<std::string, std::string> newPair = std::pair<std::string, std::string>(letterOne, letterTwo);
     bool diagonalPaired = false;
     std::string pairKey = letterOne + "+" + letterTwo;
+    if(_pairedRNA.size() > 30)
+        return;
     if (_complementDictionary.find(pairKey) != _complementDictionary.end())
         diagonalPaired = true;
     if (_nussinovMatrix.matrix[j][i] == "0") // no more pairing needed
@@ -155,10 +157,10 @@ void RNAFold::Nussinov::TraceBack(int j, int i, std::string finalPair, std::vect
     {
         TraceBack(j, i + 1, finalPair, process);
     }
-    if (left == 0 && diagBehind == 0 && under == 0)
-    {
-        TraceBack(j - 1, i + 1, finalPair, process);
-    }
+    // if (left == 0 && diagBehind == 0 && under == 0)
+    // {
+    //     TraceBack(j - 1, i + 1, finalPair, process);
+    // }
     for (int k = i + 1; k < j - 1; k++)
     {
         if (std::stoi(_nussinovMatrix.matrix[k][i])
